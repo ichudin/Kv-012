@@ -25,7 +25,7 @@
         function activate() {
 
             if (!RunsApiService.currentRun()) {
-                RunsApiService.getRuns().get({id: $stateParams.id}).$promise.then(processData, processError);
+                RunsApiService.getRunResource().get({id: $stateParams.id}).$promise.then(processData, processError);
             }
             else
             {
