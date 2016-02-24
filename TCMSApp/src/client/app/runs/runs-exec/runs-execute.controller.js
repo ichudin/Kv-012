@@ -5,9 +5,10 @@
         .module('app.runsExec')
         .controller('RunsExecuteController', RunsExecuteController);
 
-    RunsExecuteController.$inject = ['$stateParams', '$state', 'logger','moment','RunsApiService', '$interval'];
+    RunsExecuteController.$inject =
+        ['$stateParams', '$state', 'logger','moment','RunsApiService', '$interval', '$timeout'];
 
-    function RunsExecuteController($stateParams, $state, logger, moment,  RunsApiService, $interval) {
+    function RunsExecuteController($stateParams, $state, logger, moment,  RunsApiService, $interval, $timeout) {
 
         var vm = this;
         vm.run = undefined;
@@ -17,6 +18,7 @@
         vm.changeStepStatus = changeStepStatus;
         vm.startRun = startRun;
         vm.intervalTask = undefined;
+        vm.viewAllSteps = false;
 
         activate();
 
@@ -60,12 +62,13 @@
         }
 
         function startRun() {
-            var currentDate = 0, dateStart = 0, interval = 0;//store for current time
+            var currentDate = 0, dateResume = 0, interval = 0;// vm.run.intervalOfExecution;//store for current time
 
             if (vm.isExecuting) {
                 vm.isExecuting = false;
                 $interval.cancel(vm.intervalTask);
                 vm.intervalTask = undefined;
+
 
                 logger.info('Execution of ' + vm.selectedTest.testName + ' paused.');
             } else
@@ -78,10 +81,10 @@
                     vm.run.status = 'pending';
                     vm.run.dateStart = (new Date()).toISOString();
                 }
-                dateStart = Date.parse(vm.run.dateStart);
+                dateResume = Date.now();
                 vm.intervalTask = $interval(function() {
                     currentDate = Date.now();
-                    interval = Math.round((currentDate - dateStart) / 1000) * 1000;
+                    interval += 1000;
                     vm.intervalOfExecution = interval;
                 }, 1000);
 
@@ -174,10 +177,20 @@
 
                 //if we have finished the very last test case
                 if (isLastStep && ((indexOfSelectedTest + 1) < vm.run.tests.length)) {
-                    vm.selectedTest = vm.run.tests[indexOfSelectedTest + 1];
-                    if (vm.selectedTest.suite !== vm.selectedSuite) {
-                        vm.selectedSuite = vm.selectedTest.suite;
+                    if (vm.viewAllSteps) {
+                        vm.selectedTest = vm.run.tests[indexOfSelectedTest + 1];
+                        if (vm.selectedTest.suite !== vm.selectedSuite) {
+                            vm.selectedSuite = vm.selectedTest.suite;
+                        }
+                    } else {
+                        $timeout(function () {
+                            vm.selectedTest = vm.run.tests[indexOfSelectedTest + 1];
+                            if (vm.selectedTest.suite !== vm.selectedSuite) {
+                                vm.selectedSuite = vm.selectedTest.suite;
+                            }
+                        }, 1500);
                     }
+
                 }
 
             }
