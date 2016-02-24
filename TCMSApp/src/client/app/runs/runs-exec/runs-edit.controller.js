@@ -26,6 +26,7 @@
             //TODO: change this temporary solution of exchanging run data between edit and run tabs
             vm.run = result;
             vm.run.status = 'new';
+            vm.run.intervalOfExecution = 0;
             if (!vm.run.envFull) {
                 vm.run.envFull = {};
             }
@@ -52,7 +53,7 @@
         function executeRun() {
             RunsApiService.getTestsOfRunResource(vm.run._id).query().$promise
                 .then(function (tests) {
-                    vm.run.tests = JSON.parse(JSON.stringify(tests));
+                    vm.run.tests = tests;
 
                     var i = vm.run.tests.length;
                     while (i--) {
@@ -68,6 +69,7 @@
                         result.envShort = vm.run.envShort;
                         result.envFull = vm.run.envFull;
                         result.status = 'new';
+                        result.intervalOfExecution = vm.run.intervalOfExecution;
                         result.$save();
 
                         RunsApiService.currentRun(vm.run);

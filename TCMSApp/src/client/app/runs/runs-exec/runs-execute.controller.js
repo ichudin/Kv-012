@@ -41,6 +41,8 @@
         function processData(result) {
             //TODO: change this temporary solution of exchanging run data between edit and run tabs
             vm.run = result;
+            if (vm.run.intervalOfExecution) vm.intervalOfExecution = vm.run.intervalOfExecution;
+            console.log(vm.intervalOfExecution);
 
             if (!vm.run.tests) {
                 RunsApiService.getTestsOfRunResource(vm.run._id).query().$promise
@@ -62,13 +64,13 @@
         }
 
         function startRun() {
-            var currentDate = 0, dateResume = 0, interval = 0;// vm.run.intervalOfExecution;//store for current time
 
             if (vm.isExecuting) {
                 vm.isExecuting = false;
                 $interval.cancel(vm.intervalTask);
                 vm.intervalTask = undefined;
-
+                vm.run.intervalOfExecution = vm.intervalOfExecution;
+                vm.run.$save();
 
                 logger.info('Execution of ' + vm.selectedTest.testName + ' paused.');
             } else
@@ -81,11 +83,8 @@
                     vm.run.status = 'pending';
                     vm.run.dateStart = (new Date()).toISOString();
                 }
-                dateResume = Date.now();
                 vm.intervalTask = $interval(function() {
-                    currentDate = Date.now();
-                    interval += 1000;
-                    vm.intervalOfExecution = interval;
+                    vm.intervalOfExecution += 1000;
                 }, 1000);
 
             }
