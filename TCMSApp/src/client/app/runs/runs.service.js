@@ -22,14 +22,14 @@
                 return $resource(apiUrl.host + apiUrl.runs + '/:id?query={"project": "' +
                 user.currentProjectID + '"}&populate=author', {id: '@_id'});
             },
-            getTestsOfRun: function (runID) {
+            getTestsOfRunResource: function (runID) {
                 return $resource(apiUrl.host + apiUrl.runTests + '?query={"run" : "' + runID + '"}');
             },
             getSuite: function (suiteID) {
                 return $resource(apiUrl.host + apiUrl.suites + '/' + suiteID);
             },
-            saveRun: function() {
-                return $resource(apiUrl.host + apiUrl.runs);
+            getRunResource: function() {
+                return $resource(apiUrl.host + apiUrl.runs + '/:id', {id: '@_id'});
             },
             saveTestsOfRun: function (runID) {
                 return $resource(apiUrl.host + apiUrl.runTests);
