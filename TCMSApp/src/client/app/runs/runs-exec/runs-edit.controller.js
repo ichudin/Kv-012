@@ -53,7 +53,7 @@
         function executeRun() {
             RunsApiService.getTestsOfRunResource(vm.run._id).query().$promise
                 .then(function (tests) {
-                    vm.run.tests = tests;
+                    vm.run.tests = JSON.parse(JSON.stringify(tests));
 
                     var i = vm.run.tests.length;
                     while (i--) {

@@ -70,7 +70,20 @@
                 $interval.cancel(vm.intervalTask);
                 vm.intervalTask = undefined;
                 vm.run.intervalOfExecution = vm.intervalOfExecution;
-                vm.run.$save();
+
+                RunsApiService.getRunResource().get({id: vm.run._id}, function (updateRun) {
+                    updateRun.status = vm.run.status;
+                    updateRun.intervalOfExecution = vm.run.intervalOfExecution;
+                    updateRun.$save();
+                });
+
+                vm.run.tests.forEach(function (test) {
+                    RunsApiService.RunTestResource().get({id: test._id}, function (updateTest) {
+                        updateTest.status = test.status;
+                        updateTest.steps = test.steps;
+                        updateTest.$save();
+                    });
+                });
 
                 logger.info('Execution of ' + vm.selectedTest.testName + ' paused.');
             } else
